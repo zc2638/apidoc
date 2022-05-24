@@ -15,8 +15,8 @@ The `wkhtmltopdf` package must be installed.
 
 ### Source Code
 
-```go
-go install github.com/zc2638/apidoc@latest
+```shell
+go install github.com/zc2638/apidoc/cmd/apidoc@latest
 ```
 
 ## Example
