@@ -1,0 +1,279 @@
+<!--
+ Copyright © 2022 zc2638 <zc2638@qq.com>.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ .Info.Title }}</title>
+    <style>
+        pre {
+            color: #fff;
+            background: rgb(51, 51, 51);
+            padding: 10px;
+            white-space: pre-wrap !important;
+            word-break: break-all;
+            border-radius: 6px;
+        }
+
+        table {
+            font: bold 16px/1.4em "Trebuchet MS", sans-serif;
+        }
+
+        table thead th {
+            padding: 15px;
+            text-shadow: 1px 1px 1px #568F23;
+            color: #fff;
+            background-color: #61affe;
+            border-radius: 5px 5px 0 0;
+        }
+
+        table thead th:empty {
+            background-color: transparent;
+            border: none;
+        }
+
+        table tbody td {
+            padding: 10px;
+            text-align: center;
+            text-shadow: 1px 1px 1px #fff;
+            color: #666;
+            background-color: #F1F7FE;
+            border-radius: 2px;
+        }
+
+        .method {
+            padding: 5px;
+            border: 1px solid #61affe;
+            background: #F1F7FE;
+        }
+
+        .name {
+            display: inline-block;
+            border-radius: 3px;
+            min-width: 80px;
+            padding: 6px 0;
+            text-shadow: 0 1px 0 rgb(0 0 0 / 10%);
+            text-align: center;
+            color: #fff;
+            background: #61affe;
+        }
+
+        .method-get {
+            border: 1px solid #61affe;
+            background: rgba(97, 175, 254, .1);
+        }
+
+        .method-get .name {
+            background: #61affe;
+        }
+
+        .method-post {
+            border: 1px solid #49cc90;
+            background: rgba(73, 204, 144, .1);
+        }
+
+        .method-post .name {
+            background: #49cc90;
+        }
+
+        .method-put {
+            border: 1px solid #fca130;
+            background: rgba(252, 161, 48, .1);
+        }
+
+        .method-put .name {
+            background: #fca130;
+        }
+
+        .method-patch {
+            border: 1px solid #50e3c2;
+            background: rgba(80, 227, 194, .1);
+        }
+
+        .method-patch .name {
+            background: #50e3c2;
+        }
+
+        .method-delete {
+            border: 1px solid #f93e3e;
+            background: rgba(249, 62, 62, .1);
+        }
+
+        .method-delete .name {
+            background: #f93e3e;
+        }
+
+        .method-head {
+            border: 1px solid #9012fe;
+            background: rgba(144, 18, 254, .1);
+        }
+
+        .method-head .name {
+            background: #9012fe;
+        }
+
+        .method-options {
+            border: 1px solid #0d5aa7;
+            background: rgba(13, 90, 167, .1);
+        }
+
+        .method-options .name {
+            background: #0d5aa7;
+        }
+
+        .method .path {
+            padding: 6px 10px;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .detail {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+<h1> {{ .Info.Title }} </h1>
+
+<h2> Description </h2>
+<p>{{ .Info.Description }}</p>
+
+<h2> Server </h2>
+{{ range $s := .Schemes }}
+<p>{{ $s }}://{{ $.Host }}{{ $.BasePath }}</p>
+{{ end }}
+
+<!--<h2> Authorization </h2>-->
+<!--<p> TODO </p>-->
+
+<h2> Definition </h2>
+{{ range $tag := .Tags }}
+<div>
+    <h3>
+        <span>{{ $tag.Name }}</span>
+        <span>{{ $tag.Description }}</span>
+    </h3>
+    <div>
+        {{ range $path, $es := $.Paths }}
+        {{ $set := getEndpointSet $es }}
+
+        {{ range $e := $set }}
+        {{ if checkTag $e $tag.Name }}
+        <div>
+            <h4>{{ if eq $e.Summary "" }}{{ $path }}{{ else }}{{ $e.Summary }}{{ end }}</h4>
+            <div class="method method-{{ toLower $e.Method }}">
+                <span class="name">{{ $e.Method }}</span>
+                <span class="path">{{ $path }}</span>
+            </div>
+
+            <div class="detail">
+                <p>{{ $e.Description }}</p>
+                {{ $parameters := getParameters $e }}
+                {{ $length := len $parameters }}
+                {{ if gt $length 0 }}
+                <div>
+                    <h5>Request Params</h5>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>name</th>
+                            <th>position</th>
+                            <th>type</th>
+                            <th>required</th>
+                            <th>default</th>
+                            <th>description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{ range $param := $parameters }}
+                        <tr>
+                            <td>{{ $param.Name }}</td>
+                            <td>{{ $param.In }}</td>
+                            <td>{{ $param.Type }}</td>
+                            <td>{{ if $param.Required }}True{{ else }}False{{ end }}</td>
+                            <td>{{ $param.Default }}</td>
+                            <td>{{ $param.Description }}</td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+                {{ end }}
+
+                {{ $body := getBody $ $e }}
+                {{ if ne $body "" }}
+                <div>
+                    <h5>Request Body</h5>
+                    <pre>{{ $body }}</pre>
+                </div>
+                {{ end }}
+
+                {{ $resLen := len $e.Responses }}
+                {{ if gt $resLen 0 }}
+                <div>
+                    <h5>Response</h5>
+                    {{ range $code, $res := $e.Responses }}
+                    <div>
+                        <p>{{ $code }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $res.Description }}</p>
+                        {{ $headersLen := len $res.Headers }}
+                        {{ if gt $headersLen 0 }}
+                        <p>Headers</p>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>name</th>
+                                <th>type</th>
+                                <th>description</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {{ range $name, $header := $res.Headers }}
+                            <tr>
+                                <td>{{ $name }}</td>
+                                <td>{{ $header.Type }}</td>
+                                <td>{{ $header.Description }}</td>
+                            </tr>
+                            {{ end }}
+                            </tbody>
+                        </table>
+                        {{ end }}
+                        {{ $resBody := getResponse $ $res }}
+                        {{ if ne $resBody "" }}
+                        <div>
+                            <pre>{{ $resBody }}</pre>
+                        </div>
+                        {{ end }}
+                    </div>
+                    {{ end }}
+                </div>
+                {{ end }}
+            </div>
+        </div>
+        {{ end }}
+        {{ end }}
+        {{ end }}
+    </div>
+</div>
+{{ end }}
+
+
+</body>
+</html>
