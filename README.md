@@ -19,6 +19,12 @@ The `wkhtmltopdf` package must be installed.
 go install github.com/zc2638/apidoc/cmd/apidoc@latest
 ```
 
-## Example
+## Use
+
+```shell
+apidoc --src <your-swagger-json> [--dest <your-output-dir>]
+```
+
+## Toolkit Example
 
 Please visit the [example](./example/main.go)
