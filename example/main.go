@@ -31,10 +31,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := os.MkdirAll("gen", os.ModePerm); err != nil {
+	if err := os.MkdirAll("dist", os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
-	if err := apidoc.SaveToPDF(data, "gen/swagger.pdf"); err != nil {
+	if err := apidoc.SaveToPDF(data, "dist/swagger.pdf"); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -18,7 +18,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ .Info.Title }}</title>
+    <title>{{- .Info.Title -}}</title>
     <style>
         pre {
             color: #fff;
@@ -151,44 +151,44 @@
 </head>
 <body>
 
-<h1> {{ .Info.Title }} </h1>
+<h1> {{- .Info.Title -}} </h1>
 
 <h2> Description </h2>
-<p>{{ .Info.Description }}</p>
+<p>{{- .Info.Description -}}</p>
 
 <h2> Server </h2>
-{{ range $s := .Schemes }}
-<p>{{ $s }}://{{ $.Host }}{{ $.BasePath }}</p>
-{{ end }}
+{{ range $s := .Schemes -}}
+<p>{{- $s -}}://{{- $.Host -}}{{- $.BasePath -}}</p>
+{{- end }}
 
 <!--<h2> Authorization </h2>-->
 <!--<p> TODO </p>-->
 
 <h2> Definition </h2>
-{{ range $tag := .Tags }}
+{{ range $tag := .Tags -}}
 <div>
     <h3>
-        <span>{{ $tag.Name }}</span>
-        <span>{{ $tag.Description }}</span>
+        <span>{{- $tag.Name -}}</span>
+        <span>{{- $tag.Description -}}</span>
     </h3>
     <div>
-        {{ range $path, $es := $.Paths }}
-        {{ $set := getEndpointSet $es }}
+        {{ range $path, $es := $.Paths -}}
+        {{- $set := getEndpointSet $es -}}
 
-        {{ range $e := $set }}
-        {{ if checkTag $e $tag.Name }}
+        {{ range $e := $set -}}
+        {{ if checkTag $e $tag.Name -}}
         <div>
-            <h4>{{ if eq $e.Summary "" }}{{ $path }}{{ else }}{{ $e.Summary }}{{ end }}</h4>
-            <div class="method method-{{ toLower $e.Method }}">
-                <span class="name">{{ $e.Method }}</span>
-                <span class="path">{{ $path }}</span>
+            <h4>{{ if eq $e.Summary "" -}}{{- $path -}}{{- else -}}{{- $e.Summary -}}{{- end }}</h4>
+            <div class="method method-{{- toLower $e.Method -}}">
+                <span class="name">{{- $e.Method -}}</span>
+                <span class="path">{{- $path -}}</span>
             </div>
 
             <div class="detail">
-                <p>{{ $e.Description }}</p>
+                <p>{{- $e.Description -}}</p>
                 {{ $parameters := getParameters $e }}
-                {{ $length := len $parameters }}
-                {{ if gt $length 0 }}
+                {{- $length := len $parameters -}}
+                {{ if gt $length 0 -}}
                 <div>
                     <h5>Request Params</h5>
                     <table>
@@ -203,38 +203,38 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {{ range $param := $parameters }}
+                        {{ range $param := $parameters -}}
                         <tr>
-                            <td>{{ $param.Name }}</td>
-                            <td>{{ $param.In }}</td>
-                            <td>{{ $param.Type }}</td>
-                            <td>{{ if $param.Required }}True{{ else }}False{{ end }}</td>
-                            <td>{{ $param.Default }}</td>
-                            <td>{{ $param.Description }}</td>
+                            <td>{{- $param.Name -}}</td>
+                            <td>{{- $param.In -}}</td>
+                            <td>{{- $param.Type -}}</td>
+                            <td>{{ if $param.Required -}}True{{- else -}}False{{- end }}</td>
+                            <td>{{- $param.Default -}}</td>
+                            <td>{{- $param.Description -}}</td>
                         </tr>
-                        {{ end }}
+                        {{ end -}}
                         </tbody>
                     </table>
                 </div>
-                {{ end }}
+                {{- end -}}
 
-                {{ $body := getBody $ $e }}
-                {{ if ne $body "" }}
+                {{- $body := getBody $ $e -}}
+                {{ if ne $body "" -}}
                 <div>
                     <h5>Request Body</h5>
-                    <pre>{{ $body }}</pre>
+                    <pre>{{- $body -}}</pre>
                 </div>
-                {{ end }}
+                {{- end }}
 
-                {{ $resLen := len $e.Responses }}
-                {{ if gt $resLen 0 }}
+                {{- $resLen := len $e.Responses -}}
+                {{ if gt $resLen 0 -}}
                 <div>
                     <h5>Response</h5>
-                    {{ range $code, $res := $e.Responses }}
+                    {{ range $code, $res := $e.Responses -}}
                     <div>
-                        <p>{{ $code }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $res.Description }}</p>
-                        {{ $headersLen := len $res.Headers }}
-                        {{ if gt $headersLen 0 }}
+                        <p>{{- $code -}}&nbsp;&nbsp;&nbsp;&nbsp;{{- $res.Description -}}</p>
+                        {{- $headersLen := len $res.Headers }}
+                        {{ if gt $headersLen 0 -}}
                         <p>Headers</p>
                         <table>
                             <thead>
@@ -245,35 +245,34 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {{ range $name, $header := $res.Headers }}
+                            {{ range $name, $header := $res.Headers -}}
                             <tr>
-                                <td>{{ $name }}</td>
-                                <td>{{ $header.Type }}</td>
-                                <td>{{ $header.Description }}</td>
+                                <td>{{- $name -}}</td>
+                                <td>{{- $header.Type -}}</td>
+                                <td>{{- $header.Description -}}</td>
                             </tr>
-                            {{ end }}
+                            {{- end }}
                             </tbody>
                         </table>
-                        {{ end }}
-                        {{ $resBody := getResponse $ $res }}
-                        {{ if ne $resBody "" }}
+                        {{- end }}
+                        {{- $resBody := getResponse $ $res -}}
+                        {{ if ne $resBody "" -}}
                         <div>
-                            <pre>{{ $resBody }}</pre>
+                            <pre>{{- $resBody -}}</pre>
                         </div>
-                        {{ end }}
+                        {{- end }}
                     </div>
-                    {{ end }}
+                    {{- end }}
                 </div>
-                {{ end }}
+                {{- end }}
             </div>
         </div>
-        {{ end }}
-        {{ end }}
-        {{ end }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
     </div>
 </div>
-{{ end }}
-
+{{- end }}
 
 </body>
 </html>

@@ -4,41 +4,39 @@
 [![GoDoc](https://pkg.go.dev/badge/github.com/zc2638/apidoc)](https://pkg.go.dev/github.com/zc2638/apidoc)
 [![Go Report Card](https://goreportcard.com/badge/github.com/zc2638/apidoc?style=flat-square)](https://goreportcard.com/report/github.com/zc2638/apidoc)
 
-English | [简体中文](./README_zh.md)
+[English](./README.md) | 简体中文
 
-This is a tool and `Golang` package that uses `swagger2.0` definitions to generate API static documents (such as pdf) based
-on template files.
+这是一个使用 `swagger2.0` 定义，基于模板文件生成API静态文档（如pdf）的命令行工具和 `Golang`工具包。
 
-## Preconditions
+## 前提条件
 
-The `wkhtmltopdf` package must be installed.
+`wkhtmltopdf` 必须被安装。
 
 - MacOS: `brew install Caskroom/cask/wkhtmltopdf`
-- multiple operating systems can be found
-  at [https://wkhtmltopdf.org/downloads.html](https://wkhtmltopdf.org/downloads.html).
+- 其它操作系统安装方式见 [https://wkhtmltopdf.org/downloads.html](https://wkhtmltopdf.org/downloads.html).
 
-## Installation
+## 安装
 
-### Source Code
+### 源码
 
 ```shell
 go install github.com/zc2638/apidoc/cmd/apidoc@latest
 ```
 
-## Use
+## 使用
 
-### From File
+### 文件
 
 ```shell
 apidoc --src <your-swagger-json> [--dest <your-output-dir>]
 ```
 
-### From URL
+### 根据URL
 
 ```shell
 apidoc --src https://petstore.swagger.io/v2/swagger.json
 ```
 
-## Toolkit Example
+## 工具包使用示例
 
-Please visit the [example](./example/main.go)
+请查看 [example](./example/main.go)
