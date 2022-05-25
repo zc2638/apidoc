@@ -18,6 +18,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"strings"
 	"text/template"
 
@@ -68,4 +70,21 @@ func Parse(content []byte) ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
+}
+
+func ParseFromURL(url string) ([]byte, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("request failed, expect %d, actual %d", http.StatusOK, resp.StatusCode)
+	}
+	defer resp.Body.Close()
+
+	var body bytes.Buffer
+	if _, err := io.Copy(&body, resp.Body); err != nil {
+		return nil, err
+	}
+	return Parse(body.Bytes())
 }

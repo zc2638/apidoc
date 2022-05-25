@@ -16,6 +16,7 @@ package app
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -45,13 +46,22 @@ func NewServerCommand() *cobra.Command {
 				return fmt.Errorf("other formats will be supported soon")
 			}
 
-			fileData, err := os.ReadFile(opt.Src)
-			if err != nil {
-				return fmt.Errorf("read src file failed: %v", err)
-			}
-			data, err := apidoc.Parse(fileData)
-			if err != nil {
-				return err
+			var data []byte
+			uri, err := url.Parse(opt.Src)
+			if err == nil && uri.Host != "" {
+				data, err = apidoc.ParseFromURL(opt.Src)
+				if err != nil {
+					return err
+				}
+			} else {
+				fileData, err := os.ReadFile(opt.Src)
+				if err != nil {
+					return fmt.Errorf("read src file failed: %v", err)
+				}
+				data, err = apidoc.Parse(fileData)
+				if err != nil {
+					return err
+				}
 			}
 
 			if err := os.MkdirAll(opt.Dest, os.ModePerm); err != nil {

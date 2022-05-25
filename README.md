@@ -21,8 +21,16 @@ go install github.com/zc2638/apidoc/cmd/apidoc@latest
 
 ## Use
 
+### From swagger file
+
 ```shell
 apidoc --src <your-swagger-json> [--dest <your-output-dir>]
+```
+
+### From url
+
+```shell
+apidoc --src https://petstore.swagger.io/v2/swagger.json
 ```
 
 ## Toolkit Example
