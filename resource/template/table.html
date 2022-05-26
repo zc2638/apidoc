@@ -27,8 +27,6 @@
             white-space: pre-wrap !important;
             word-break: break-all;
             border-radius: 6px;
-            line-height: 16px;
-            font-weight: bold;
         }
 
         table {
@@ -55,11 +53,6 @@
             color: #666;
             background-color: #F1F7FE;
             border-radius: 2px;
-        }
-
-        .tag-desc {
-            font-weight: normal;
-            font-size: 14px;
         }
 
         .method {
@@ -158,13 +151,10 @@
 </head>
 <body>
 
-<h1>
-    {{- .Info.Title -}}
-    <span style="font-size: 20px;">{{ .Info.Version }}</span>
-</h1>
+<h1> {{- .Info.Title -}} </h1>
 
 <h2> Description </h2>
-<p>{{- mdToHTML .Info.Description -}}</p>
+<p>{{- .Info.Description -}}</p>
 
 <h2> Server </h2>
 {{ range $s := .Schemes -}}
@@ -179,7 +169,7 @@
 <div>
     <h3>
         <span>{{- $tag.Name -}}</span>
-        <span class="tag-desc">{{- $tag.Description -}}</span>
+        <span>{{- $tag.Description -}}</span>
     </h3>
     <div>
         {{ range $path, $es := $.Paths -}}
@@ -195,46 +185,34 @@
             </div>
 
             <div class="detail">
-                <p>{{- mdToHTML $e.Description -}}</p>
-                {{ $parameters := getParameters $e }}
-                {{- $length := len $parameters -}}
-                {{ if gt $length 0 -}}
+                {{- $bodyRows := getBodyRows $ $e -}}
                 <div>
-                    <h5>Request Params</h5>
+                    <h5>Request Body</h5>
                     <table>
                         <thead>
                         <tr>
                             <th>name</th>
-                            <th>position</th>
                             <th>type</th>
                             <th>required</th>
                             <th>default</th>
+                            <th>enum</th>
                             <th>description</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {{ range $param := $parameters -}}
+                        {{ range $bodyRow := $bodyRows -}}
                         <tr>
-                            <td>{{- $param.Name -}}</td>
-                            <td>{{- $param.In -}}</td>
-                            <td>{{- $param.Type -}}</td>
-                            <td>{{ if $param.Required -}}True{{- else -}}False{{- end }}</td>
-                            <td>{{- $param.Default -}}</td>
-                            <td>{{- $param.Description -}}</td>
+                            <td style="text-align: left">{{- $bodyRow.Name -}}</td>
+                            <td>{{- $bodyRow.Type -}}</td>
+                            <td>{{ if $bodyRow.Required -}}True{{- else -}}False{{- end }}</td>
+                            <td>{{- $bodyRow.Example -}}</td>
+                            <td>{{- $enumLen := len $bodyRow.Enum -}}{{ if gt $enumLen 0 -}}{{ $bodyRow.Enum }}{{- end }}</td>
+                            <td>{{- $bodyRow.Description -}}</td>
                         </tr>
                         {{ end -}}
                         </tbody>
                     </table>
                 </div>
-                {{- end -}}
-
-                {{- $body := getBody $ $e -}}
-                {{ if ne $body "" -}}
-                <div>
-                    <h5>Request Body</h5>
-                    <pre>{{- $body -}}</pre>
-                </div>
-                {{- end }}
 
                 {{- $resLen := len $e.Responses -}}
                 {{ if gt $resLen 0 -}}
@@ -242,35 +220,12 @@
                     <h5>Response</h5>
                     {{ range $code, $res := $e.Responses -}}
                     <div>
-                        <p>{{- $code -}}&nbsp;&nbsp;&nbsp;&nbsp;{{- $res.Description -}}</p>
-                        {{- $headersLen := len $res.Headers }}
-                        {{ if gt $headersLen 0 -}}
-                        <p>Headers</p>
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>name</th>
-                                <th>type</th>
-                                <th>description</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {{ range $name, $header := $res.Headers -}}
-                            <tr>
-                                <td>{{- $name -}}</td>
-                                <td>{{- $header.Type -}}</td>
-                                <td>{{- $header.Description -}}</td>
-                            </tr>
-                            {{- end }}
-                            </tbody>
-                        </table>
-                        {{- end }}
-                        {{- $resBody := getResponse $ $res -}}
-                        {{ if ne $resBody "" -}}
+                        {{- $resBodyRows := getResponseRows $ $res -}}
                         <div>
-                            <pre>{{- $resBody -}}</pre>
+                            {{ range $resBodyRow := $resBodyRows -}}
+                            <p>{{ $resBodyRow.Name }}{{ $resBodyRow.Type }}&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                            {{- end }}
                         </div>
-                        {{- end }}
                     </div>
                     {{- end }}
                 </div>

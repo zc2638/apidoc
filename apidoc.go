@@ -18,10 +18,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io"
 	"net/http"
 	"strings"
-	"text/template"
 
 	dittoJson "github.com/99nil/ditto/json"
 	"gopkg.in/yaml.v2"
@@ -32,12 +32,16 @@ import (
 
 var defaultTemplate = template.New("default").
 	Funcs(template.FuncMap{
-		"toLower":        strings.ToLower,
-		"checkTag":       checkTag,
-		"getEndpointSet": getEndpointSet,
-		"getParameters":  getParameters,
-		"getBody":        getBody,
-		"getResponse":    getResponse,
+		"toLower":         strings.ToLower,
+		"toHTML":          toHTML,
+		"mdToHTML":        mdToHTML,
+		"checkTag":        checkTag,
+		"getEndpointSet":  getEndpointSet,
+		"getParameters":   getParameters,
+		"getBody":         getBody,
+		"getResponse":     getResponse,
+		"getBodyRows":     getBodyRows,
+		"getResponseRows": getResponseRows,
 	})
 
 func Parse(content []byte) ([]byte, error) {

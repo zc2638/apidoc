@@ -17,6 +17,7 @@ package swag
 import (
 	"path"
 	"strconv"
+	"strings"
 )
 
 type ParameterType string
@@ -99,4 +100,94 @@ func ConvertSchemaToValue(set map[string]interface{}, schema *Schema) (interface
 		value = objs
 	}
 	return value, true
+}
+
+type Row struct {
+	Name        string
+	Type        ParameterType
+	Required    bool
+	Description string
+	Enum        string
+	Example     string
+}
+
+func ConvertSchemaToRowSet(schemas map[string]*Schema) map[string][]Row {
+	set := make(map[string][]Row)
+	extra := make(map[string]*Schema)
+	for name, s := range schemas {
+		extra[name] = s
+	}
+	for len(extra) > 0 {
+		empty := make(map[string]*Schema)
+		for name, s := range extra {
+			ref := path.Join("#/definitions", name)
+			if s.Ref != "" {
+				empty[name] = s
+				continue
+			}
+			out, ok := ConvertSchemaToRow(set, s, nil, false)
+			if !ok {
+				empty[name] = s
+				continue
+			}
+			set[ref] = out
+		}
+		extra = empty
+	}
+	return set
+}
+
+func ConvertSchemaToRow(set map[string][]Row, schema *Schema, names []string, required bool) ([]Row, bool) {
+	if schema.Ref != "" {
+		out, ok := set[schema.Ref]
+		if !ok {
+			return nil, false
+		}
+		current := make([]Row, 0, len(out))
+		for _, v := range out {
+			nameSet := names
+			if v.Name != "" {
+				nameSet = append(names, v.Name)
+			}
+			v.Name = strings.Join(nameSet, ".")
+			current = append(current, v)
+		}
+		return current, true
+	}
+
+	var rows []Row
+	rows = append(rows, Row{
+		Type:        schema.Type,
+		Name:        strings.Join(names, "."),
+		Required:    required,
+		Description: schema.Description,
+		Enum:        strings.Join(schema.Enum, ", "),
+		Example:     schema.Example,
+	})
+	switch schema.Type {
+	case Array:
+		nameSet := append(names, "[]")
+		out, ok := ConvertSchemaToRow(set, schema.Items, nameSet, false)
+		if !ok {
+			return nil, false
+		}
+		rows = append(rows, out...)
+	case Object:
+		for na, s := range schema.Properties {
+			isRequired := false
+			for _, rn := range schema.Required {
+				if rn == na {
+					isRequired = true
+					break
+				}
+			}
+			nameSet := append(names, na)
+			out, ok := ConvertSchemaToRow(set, s, nameSet, isRequired)
+			if !ok {
+				return nil, false
+			}
+			rows = append(rows, out...)
+		}
+	}
+	return rows, true
 }

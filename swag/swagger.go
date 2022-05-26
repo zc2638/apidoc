@@ -25,7 +25,8 @@ import (
 // It combines what previously was the Resource Listing
 // and API Declaration (version 1.2 and earlier) together into one document.
 type API struct {
-	set map[string]interface{}
+	set    map[string]interface{}
+	rowSet map[string][]Row
 
 	// Required. Specifies the Swagger Specification version being used.
 	// It can be used by the Swagger UI and other clients to interpret the API listing.
@@ -79,11 +80,32 @@ type API struct {
 
 func (a *API) TransformSchemas() {
 	a.set = ConvertSchemaToMap(a.Definitions)
+	a.rowSet = ConvertSchemaToRowSet(a.Definitions)
 }
 
 func (a *API) GetObject(schema *Schema) interface{} {
+	if schema == nil {
+		return nil
+	}
 	if obj, ok := ConvertSchemaToValue(a.set, schema); ok {
 		return obj
+	}
+	return nil
+}
+
+func (a *API) GetRows(schema *Schema) []Row {
+	if schema == nil {
+		return nil
+	}
+	if out, ok := ConvertSchemaToRow(a.rowSet, schema, nil, false); ok {
+		current := make([]Row, 0, len(out))
+		for _, v := range out {
+			if v.Name == "" {
+				continue
+			}
+			current = append(current, v)
+		}
+		return current
 	}
 	return nil
 }

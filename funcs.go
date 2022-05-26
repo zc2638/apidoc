@@ -15,12 +15,23 @@
 package apidoc
 
 import (
-	"bytes"
 	"encoding/json"
+	"html/template"
 	"net/http"
+
+	"github.com/russross/blackfriday/v2"
 
 	"github.com/zc2638/apidoc/swag"
 )
+
+func toHTML(s string) template.HTML {
+	return template.HTML(s)
+}
+
+func mdToHTML(s string) template.HTML {
+	desc := blackfriday.Run([]byte(s))
+	return template.HTML(desc)
+}
 
 func checkTag(e *swag.Endpoint, tag string) bool {
 	for _, v := range e.Tags {
@@ -93,12 +104,10 @@ func getBody(api *swag.API, e *swag.Endpoint) string {
 		}
 
 		body := api.GetObject(p.Schema)
-		data, err := json.MarshalIndent(body, "", "  ")
+		data, err := json.MarshalIndent(body, "", "    ")
 		if err != nil {
 			return ""
 		}
-		data = bytes.ReplaceAll(data, []byte("\n"), []byte("<br/>"))
-		data = bytes.ReplaceAll(data, []byte(" "), []byte("&nbsp;&nbsp;"))
 		return string(data)
 	}
 	return ""
@@ -109,11 +118,23 @@ func getResponse(api *swag.API, res *swag.Response) string {
 		return ""
 	}
 	body := api.GetObject(res.Schema)
-	data, err := json.MarshalIndent(body, "", "  ")
+	data, err := json.MarshalIndent(body, "", "    ")
 	if err != nil {
 		return ""
 	}
-	data = bytes.ReplaceAll(data, []byte("\n"), []byte("<br/>"))
-	data = bytes.ReplaceAll(data, []byte(" "), []byte("&nbsp;&nbsp;"))
 	return string(data)
+}
+
+func getBodyRows(api *swag.API, e *swag.Endpoint) []swag.Row {
+	for _, p := range e.Parameters {
+		if p.In != "body" {
+			continue
+		}
+		return api.GetRows(p.Schema)
+	}
+	return nil
+}
+
+func getResponseRows(api *swag.API, res *swag.Response) []swag.Row {
+	return api.GetRows(res.Schema)
 }
