@@ -19,34 +19,29 @@ import (
 	"os"
 	"strings"
 
-	pdf "github.com/adrg/go-wkhtmltopdf"
+	pdf "github.com/SebastiaanKlippert/go-wkhtmltopdf"
 )
 
-func SaveToPDF(data []byte, to string) error {
-	if err := pdf.Init(); err != nil {
-		return err
+func SaveToPDF(data []byte, isGray bool) ([]byte, error) {
+	gen, err := pdf.NewPDFGenerator()
+	if err != nil {
+		return nil, err
 	}
-	defer pdf.Destroy()
+	gen.Dpi.Set(300)
+	gen.Grayscale.Set(isGray)
 
-	object, err := pdf.NewObjectFromReader(bytes.NewReader(data))
+	gen.AddPage(pdf.NewPageReader(bytes.NewReader(data)))
+	if err := gen.Create(); err != nil {
+		return nil, err
+	}
+	return gen.Bytes(), nil
+}
+
+func SaveToPDFFile(data []byte, isGray bool, to string) error {
+	pdfData, err := SaveToPDF(data, isGray)
 	if err != nil {
 		return err
 	}
-
-	converter, err := pdf.NewConverter()
-	if err != nil {
-		return err
-	}
-	defer converter.Destroy()
-
-	converter.Add(object)
-
-	converter.PaperSize = pdf.A4
-	converter.Orientation = pdf.Landscape
-	converter.MarginTop = "1cm"
-	converter.MarginBottom = "1cm"
-	converter.MarginLeft = "10mm"
-	converter.MarginRight = "10mm"
 
 	to = strings.TrimSuffix(to, ".pdf") + ".pdf"
 	outFile, err := os.Create(to)
@@ -55,5 +50,6 @@ func SaveToPDF(data []byte, to string) error {
 	}
 	defer outFile.Close()
 
-	return converter.Run(outFile)
+	_, err = outFile.Write(pdfData)
+	return err
 }

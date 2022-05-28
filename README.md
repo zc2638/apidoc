@@ -6,10 +6,15 @@
 
 English | [简体中文](./README_zh.md)
 
-This is a tool and `Golang` package that uses `swagger2.0` definitions to generate API static documents (such as pdf) based
+This is a tool and `Golang` package that uses `swagger2.0` definitions to generate API static documents (such as pdf)
+based
 on template files.
 
-## Preconditions
+## Installation
+
+### Source Code
+
+#### Preconditions
 
 The `wkhtmltopdf` package must be installed.
 
@@ -17,15 +22,25 @@ The `wkhtmltopdf` package must be installed.
 - multiple operating systems can be found
   at [https://wkhtmltopdf.org/downloads.html](https://wkhtmltopdf.org/downloads.html).
 
-## Installation
-
-### Source Code
+#### Install Command
 
 ```shell
 go install github.com/zc2638/apidoc/cmd/apidoc@latest
 ```
 
-## Use
+### Docker
+
+```shell
+docker pull zc2638/apidoc:latest
+```
+
+## Use In Docker
+
+```shell
+docker run --rm zc2638/apidoc:latest --src https://petstore.swagger.io/v2/swagger.json --data > petstore.pdf
+```
+
+## Use In Command
 
 ### From File
 

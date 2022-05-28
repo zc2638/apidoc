@@ -34,8 +34,10 @@ func main() {
 	if err := os.MkdirAll("dist", os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
-	os.WriteFile("dist/swagger.html", data, os.ModePerm)
-	if err := apidoc.SaveToPDF(data, "dist/swagger.pdf"); err != nil {
+	if err := os.WriteFile("dist/swagger.html", data, os.ModePerm); err != nil {
+		log.Fatal(err)
+	}
+	if err := apidoc.SaveToPDFFile(data, false, "dist/swagger.pdf"); err != nil {
 		log.Fatal(err)
 	}
 }

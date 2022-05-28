@@ -23,8 +23,9 @@ import (
 	"net/http"
 	"strings"
 
-	dittoJson "github.com/99nil/ditto/json"
 	"gopkg.in/yaml.v2"
+
+	dittoJson "github.com/99nil/ditto/json"
 
 	"github.com/zc2638/apidoc/resource"
 	"github.com/zc2638/apidoc/swag"

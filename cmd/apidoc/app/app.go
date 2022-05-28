@@ -26,11 +26,17 @@ import (
 	"github.com/zc2638/apidoc"
 )
 
+const (
+	FormatPDF     = "pdf"
+	FormatGrayPDF = "gray-pdf"
+)
+
 type Option struct {
 	Template string
 	Src      string
 	Dest     string
 	Format   string // format, default is pdf.
+	IsData   bool
 }
 
 func NewServerCommand() *cobra.Command {
@@ -42,7 +48,7 @@ func NewServerCommand() *cobra.Command {
 			if opt.Template != "default" {
 				return fmt.Errorf("custom templates will be supported soon")
 			}
-			if opt.Format != "pdf" {
+			if opt.Format != FormatPDF && opt.Format != FormatGrayPDF {
 				return fmt.Errorf("other formats will be supported soon")
 			}
 
@@ -64,13 +70,22 @@ func NewServerCommand() *cobra.Command {
 				}
 			}
 
+			if opt.IsData {
+				pdfData, err := apidoc.SaveToPDF(data, opt.Format == FormatGrayPDF)
+				if err != nil {
+					return err
+				}
+				os.Stdout.Write(pdfData)
+				return nil
+			}
+
 			if err := os.MkdirAll(opt.Dest, os.ModePerm); err != nil {
 				return fmt.Errorf("create dest dir failed: %v", err)
 			}
 			base := filepath.Base(opt.Src)
 			ext := filepath.Ext(base)
 			target := strings.TrimSuffix(base, ext) + ".pdf"
-			if err := apidoc.SaveToPDF(data, filepath.Join(opt.Dest, target)); err != nil {
+			if err := apidoc.SaveToPDFFile(data, opt.Format == FormatGrayPDF, filepath.Join(opt.Dest, target)); err != nil {
 				return fmt.Errorf("save failed: %v", err)
 			}
 			return nil
@@ -82,7 +97,8 @@ func NewServerCommand() *cobra.Command {
 
 func completionFlags(cmd *cobra.Command, opt *Option) {
 	cmd.Flags().StringVar(&opt.Template, "template", "default", "Specify the template file, the built-in `default` is used by default")
-	cmd.Flags().StringVar(&opt.Format, "format", "pdf", "Specify the output file format, the default is pdf")
+	cmd.Flags().StringVar(&opt.Format, "format", FormatPDF, "Specify the output file format(pdf、gray-pdf), the default is pdf")
 	cmd.Flags().StringVar(&opt.Src, "src", "", "Specify the swagger configuration file path")
 	cmd.Flags().StringVar(&opt.Dest, "dest", "dist", "Specify output path.")
+	cmd.Flags().BoolVar(&opt.IsData, "data", false, "Specify data mode output.")
 }
