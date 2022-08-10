@@ -10,7 +10,7 @@
 
 ## 安装
 
-### 源码
+### 1、源码
 
 #### 前提条件
 
@@ -25,7 +25,7 @@
 go install github.com/zc2638/apidoc/cmd/apidoc@latest
 ```
 
-### Docker
+### 2、Docker
 
 ```shell
 docker pull zc2638/apidoc:latest

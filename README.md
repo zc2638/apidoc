@@ -12,7 +12,7 @@ on template files.
 
 ## Installation
 
-### Source Code
+### 1、Source Code
 
 #### Preconditions
 
@@ -28,7 +28,7 @@ The `wkhtmltopdf` package must be installed.
 go install github.com/zc2638/apidoc/cmd/apidoc@latest
 ```
 
-### Docker
+### 2、Docker
 
 ```shell
 docker pull zc2638/apidoc:latest
